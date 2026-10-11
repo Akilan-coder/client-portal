@@ -1,0 +1,10 @@
+# Ignore Node.js dependencies (recreated via npm install)
+node_modules/
+
+# Ignore local environment secrets if desired
+# .env
+
+# Ignore OS logs
+npm-debug.log*
+.DS_Store
+Thumbs.db

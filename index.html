@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apex Digital Solutions | Enterprise Client Portal</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+  <div class="flex h-screen overflow-hidden">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0 transition-all duration-300">
+      <!-- Logo & Brand -->
+      <div class="h-16 flex items-center px-6 gap-3 border-b border-slate-800">
+        <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+          A
+        </div>
+        <div>
+          <h1 class="text-white font-semibold text-sm leading-tight tracking-wide">Apex Digital</h1>
+          <p id="sidebar-role-badge" class="text-xs text-indigo-400 font-medium">Client Portal</p>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-indigo-600 text-white transition">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Dashboard</span>
+        </button>
+        <button onclick="switchTab('projects')" id="nav-projects" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition">
+          <i data-lucide="folder-kanban" class="w-4 h-4"></i>
+          <span>Projects</span>
+          <span id="badge-projects-count" class="ml-auto text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full">-</span>
+        </button>
+        <button onclick="switchTab('documents')" id="nav-documents" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition">
+          <i data-lucide="file-text" class="w-4 h-4"></i>
+          <span>Document Vault</span>
+          <span id="badge-documents-count" class="ml-auto text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full">-</span>
+        </button>
+        <button onclick="switchTab('tickets')" id="nav-tickets" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition">
+          <i data-lucide="life-buoy" class="w-4 h-4"></i>
+          <span>Support & Tickets</span>
+          <span id="badge-tickets-count" class="ml-auto text-xs bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full">-</span>
+        </button>
+        <button onclick="switchTab('invoices')" id="nav-invoices" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition">
+          <i data-lucide="credit-card" class="w-4 h-4"></i>
+          <span>Billing & Invoices</span>
+        </button>
+      </nav>
+
+      <!-- Account Profile Section -->
+      <div class="p-4 border-t border-slate-800">
+        <button onclick="openModal('profileModal')" class="w-full flex items-center gap-3 p-2 rounded-lg bg-slate-800/60 hover:bg-slate-800 transition text-left group">
+          <img id="user-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-500/30" />
+          <div class="overflow-hidden flex-1">
+            <p id="user-name" class="text-xs font-medium text-white truncate">Sarah Jenkins</p>
+            <p id="user-company" class="text-[11px] text-slate-400 truncate">Acme Global Ltd.</p>
+          </div>
+          <i data-lucide="settings" class="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <!-- Top Navbar -->
+      <header class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shadow-sm relative z-30">
+        <div class="flex items-center gap-3">
+          <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Live SQLite Database Connected
+          </span>
+          <span class="text-sm text-slate-500 hidden sm:inline">Account: <strong id="user-account-id" class="text-slate-700">#ACME-8921</strong></span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <!-- Share Portal Button -->
+          <button onclick="openShareModal()" class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition flex items-center gap-1.5">
+            <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
+            <span>Share Portal</span>
+          </button>
+
+          <!-- Role Toggle Button -->
+          <button onclick="toggleUserRole()" id="role-toggle-btn" class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition flex items-center gap-1.5">
+            <i data-lucide="user-cog" class="w-3.5 h-3.5 text-indigo-600"></i>
+            <span id="role-toggle-label">Role: CLIENT</span>
+          </button>
+
+          <!-- Notifications Dropdown Button -->
+          <div class="relative">
+            <button onclick="toggleNotifications()" class="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 relative">
+              <i data-lucide="bell" class="w-5 h-5"></i>
+              <span id="notif-badge" class="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-600 rounded-full ring-2 ring-white hidden"></span>
+            </button>
+
+            <!-- Notifications Dropdown Menu -->
+            <div id="notif-dropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-200 p-4 z-50">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <span class="font-bold text-xs text-slate-800">Database Notifications</span>
+                <button onclick="markNotificationsRead()" class="text-[11px] text-indigo-600 hover:underline">Mark all read</button>
+              </div>
+              <div id="notif-list" class="space-y-2 mt-3 max-h-60 overflow-y-auto">
+                <!-- Notifications injected dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action -->
+          <button onclick="openModal('ticketModal')" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            <span>New Ticket</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable Main View -->
+      <main class="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50">
+        
+        <!-- ================= TAB: DASHBOARD ================= -->
+        <section id="tab-dashboard" class="space-y-8">
+          <div class="bg-gradient-to-r from-indigo-700 via-indigo-600 to-indigo-800 rounded-2xl p-6 md:p-8 text-white shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-2xl font-bold">Welcome back, <span id="welcome-name">Sarah</span>! 👋</h2>
+              <p class="text-indigo-100 text-sm mt-1 max-w-xl">
+                Every action you take below writes directly to the local SQLite database in real time.
+              </p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button onclick="switchTab('projects')" class="px-4 py-2 bg-white text-indigo-700 rounded-lg text-sm font-semibold hover:bg-indigo-50 transition shadow-sm">
+                View Milestones
+              </button>
+              <button onclick="openModal('projectModal')" class="px-4 py-2 bg-indigo-500/30 border border-white/20 text-white rounded-lg text-sm font-semibold hover:bg-indigo-500/50 transition shadow-sm">
+                + New Project
+              </button>
+            </div>
+          </div>
+
+          <!-- KPI Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer hover:border-indigo-300 transition" onclick="switchTab('projects')">
+              <div>
+                <p class="text-xs font-medium text-slate-500 uppercase">Active Projects</p>
+                <p id="kpi-projects" class="text-2xl font-bold text-slate-800 mt-1">...</p>
+                <span class="text-xs text-emerald-600 font-medium">● SQLite DB Synced</span>
+              </div>
+              <div class="w-11 h-11 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center">
+                <i data-lucide="briefcase" class="w-5 h-5"></i>
+              </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer hover:border-blue-300 transition" onclick="switchTab('documents')">
+              <div>
+                <p class="text-xs font-medium text-slate-500 uppercase">Documents</p>
+                <p id="kpi-documents" class="text-2xl font-bold text-slate-800 mt-1">...</p>
+                <span class="text-xs text-slate-500">Stored on Disk & DB</span>
+              </div>
+              <div class="w-11 h-11 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center">
+                <i data-lucide="folder-check" class="w-5 h-5"></i>
+              </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer hover:border-amber-300 transition" onclick="switchTab('tickets')">
+              <div>
+                <p class="text-xs font-medium text-slate-500 uppercase">Open Tickets</p>
+                <p id="kpi-tickets" class="text-2xl font-bold text-slate-800 mt-1">...</p>
+                <span class="text-xs text-amber-600 font-medium">Live Queue</span>
+              </div>
+              <div class="w-11 h-11 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center">
+                <i data-lucide="life-buoy" class="w-5 h-5"></i>
+              </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between cursor-pointer hover:border-rose-300 transition" onclick="switchTab('invoices')">
+              <div>
+                <p class="text-xs font-medium text-slate-500 uppercase">Pending Invoices</p>
+                <p id="kpi-invoices" class="text-2xl font-bold text-slate-800 mt-1">...</p>
+                <span class="text-xs text-rose-500 font-medium">Due this cycle</span>
+              </div>
+              <div class="w-11 h-11 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center">
+                <i data-lucide="credit-card" class="w-5 h-5"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts & Activity -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="font-semibold text-slate-800 text-base">Development Sprint Velocity</h3>
+                  <p class="text-xs text-slate-400">Dynamically generated from SQLite project progress</p>
+                </div>
+                <button onclick="fetchAllData()" class="p-1.5 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-slate-50 transition">
+                  <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+              </div>
+              <div class="h-64">
+                <canvas id="velocityChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Activity Feed -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+              <h3 class="font-semibold text-slate-800 text-base mb-4">Recent Database Audit Logs</h3>
+              <div id="activity-container" class="space-y-4 flex-1 overflow-y-auto max-h-64">
+                <!-- Injected dynamically -->
+              </div>
+              <button onclick="fetchAllData()" class="mt-4 w-full py-2 text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg text-center transition">
+                Refresh All Tables
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB: PROJECTS ================= -->
+        <section id="tab-projects" class="hidden space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-bold text-slate-800">Projects & Deliverables</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Directly connected to SQLite `projects` table. Create, update, or archive projects.</p>
+            </div>
+            <button onclick="openModal('projectModal')" class="flex items-center gap-2 px-3.5 py-2 text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg shadow-sm transition">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Create Project</span>
+            </button>
+          </div>
+
+          <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamic Project Cards -->
+          </div>
+        </section>
+
+        <!-- ================= TAB: DOCUMENTS ================= -->
+        <section id="tab-documents" class="hidden space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-bold text-slate-800">Secure Document Vault</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Real file upload via Multer to server disk (`uploads/`) with database records.</p>
+            </div>
+            <button onclick="openModal('docModal')" class="flex items-center gap-2 px-3.5 py-2 text-xs font-medium bg-slate-900 text-white hover:bg-slate-800 rounded-lg shadow-sm transition">
+              <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+              <span>Upload Document</span>
+            </button>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold">
+                <tr>
+                  <th class="py-3 px-4">Document Name</th>
+                  <th class="py-3 px-4">Category</th>
+                  <th class="py-3 px-4">File Size</th>
+                  <th class="py-3 px-4">Uploaded Date</th>
+                  <th class="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="documents-table-body" class="divide-y divide-slate-100 text-slate-700">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ================= TAB: TICKETS ================= -->
+        <section id="tab-tickets" class="hidden space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-bold text-slate-800">Support & Communication Threads</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Interactive ticket conversation threads saved in SQLite `ticket_messages` table.</p>
+            </div>
+            <button onclick="openModal('ticketModal')" class="flex items-center gap-2 px-3.5 py-2 text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg shadow-sm transition">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Create New Ticket</span>
+            </button>
+          </div>
+
+          <div id="tickets-container" class="space-y-3">
+            <!-- Injected dynamically -->
+          </div>
+        </section>
+
+        <!-- ================= TAB: INVOICES ================= -->
+        <section id="tab-invoices" class="hidden space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-bold text-slate-800">Invoices & Billing</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Statement history with simulated payment execution and downloadable receipt generation.</p>
+            </div>
+            <button onclick="openModal('invoiceModal')" class="flex items-center gap-2 px-3.5 py-2 text-xs font-medium bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg shadow-sm transition">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Issue New Invoice</span>
+            </button>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold">
+                <tr>
+                  <th class="py-3 px-4">Invoice #</th>
+                  <th class="py-3 px-4">Billing Period</th>
+                  <th class="py-3 px-4">Amount</th>
+                  <th class="py-3 px-4">Status</th>
+                  <th class="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="invoices-table-body" class="divide-y divide-slate-100 text-slate-700">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CREATE PROJECT ================= -->
+  <div id="projectModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="font-bold text-slate-800 text-base">Register New Project in SQLite</h3>
+        <button onclick="closeModal('projectModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form onsubmit="handleProjectSubmit(event)" class="mt-4 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Project Title</label>
+          <input id="projTitle" required type="text" placeholder="e.g. Mobile App Redesign" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Description</label>
+          <textarea id="projDesc" rows="3" placeholder="Brief project scope..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Status</label>
+            <select id="projStatus" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option>In Progress</option>
+              <option>Client Review</option>
+              <option>Completed</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Initial Progress (%)</label>
+            <input id="projProgress" type="number" min="0" max="100" value="25" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Target Due Date</label>
+            <input id="projDueDate" type="text" placeholder="e.g. Dec 15, 2026" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Project Lead</label>
+            <input id="projLead" type="text" placeholder="e.g. Elena Rostova" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-3">
+          <button type="button" onclick="closeModal('projectModal')" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm">Save to Database</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: UPDATE PROJECT PROGRESS ================= -->
+  <div id="updateProjModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="font-bold text-slate-800 text-base">Update Project Status</h3>
+        <button onclick="closeModal('updateProjModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form onsubmit="handleProjectUpdate(event)" class="mt-4 space-y-4">
+        <input type="hidden" id="editProjId" />
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Project Title</label>
+          <p id="editProjTitle" class="text-xs font-bold text-slate-800 bg-slate-50 p-2 rounded-lg border border-slate-200">-</p>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Status</label>
+          <select id="editProjStatus" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option>In Progress</option>
+            <option>Client Review</option>
+            <option>Completed</option>
+          </select>
+        </div>
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="block text-xs font-semibold text-slate-700">Progress: <span id="editProgVal" class="text-indigo-600 font-bold">50%</span></label>
+          </div>
+          <input id="editProjProgress" type="range" min="0" max="100" oninput="document.getElementById('editProgVal').innerText = this.value + '%'" class="w-full accent-indigo-600" />
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-3">
+          <button type="button" onclick="closeModal('updateProjModal')" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: UPLOAD FILE (MULTER REAL UPLOAD) ================= -->
+  <div id="docModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="font-bold text-slate-800 text-base">Upload Document to Disk Vault</h3>
+        <button onclick="closeModal('docModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form onsubmit="handleDocUpload(event)" class="mt-4 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Select File from Computer</label>
+          <input id="docFileInput" type="file" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Or Enter Document Title</label>
+          <input id="docName" type="text" placeholder="e.g. Q4 Financial Audit.pdf" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Category</label>
+          <select id="docCategory" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option>Legal</option>
+            <option>Technical</option>
+            <option>Design</option>
+            <option>Finance</option>
+          </select>
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-3">
+          <button type="button" onclick="closeModal('docModal')" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-lg shadow-sm">Upload & Save to DB</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: TICKET THREAD / CONVERSATION DRAWER ================= -->
+  <div id="threadModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-xl border border-slate-100 flex flex-col max-h-[85vh]">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div>
+          <h3 id="threadTicketTitle" class="font-bold text-slate-800 text-sm">Ticket Thread</h3>
+          <p id="threadTicketSubtitle" class="text-xs text-slate-400">#TK-402 · High Priority</p>
+        </div>
+        <button onclick="closeModal('threadModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <!-- Messages Stream -->
+      <div id="threadMessagesContainer" class="flex-1 overflow-y-auto py-4 space-y-3 min-h-[220px]">
+        <!-- Dynamic message bubbles injected here -->
+      </div>
+
+      <!-- Reply Box -->
+      <form onsubmit="handleSendReply(event)" class="pt-3 border-t border-slate-100 space-y-2">
+        <input type="hidden" id="activeThreadId" />
+        <div class="flex gap-2">
+          <input id="threadReplyInput" required type="text" placeholder="Type a message or response..." class="flex-1 text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition">Send Reply</button>
+        </div>
+        <div class="flex items-center justify-between pt-1">
+          <div class="flex items-center gap-2">
+            <span class="text-[11px] text-slate-400">Reply as:</span>
+            <select id="replySenderRole" class="text-[11px] font-semibold text-slate-700 bg-slate-100 rounded px-1.5 py-0.5 border-0">
+              <option value="CLIENT">Client (Sarah Jenkins)</option>
+              <option value="SUPPORT">Engineering Support</option>
+            </select>
+          </div>
+          <button type="button" onclick="toggleTicketResolvedStatus()" id="toggleResolvedBtn" class="text-xs text-amber-600 hover:underline font-medium">Mark as Resolved</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CREATE SUPPORT TICKET ================= -->
+  <div id="ticketModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="font-bold text-slate-800 text-base">Open a Support Request</h3>
+        <button onclick="closeModal('ticketModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form onsubmit="handleTicketSubmit(event)" class="mt-4 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Subject</label>
+          <input id="ticketSubject" required type="text" placeholder="Brief description of the request..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Priority</label>
+          <select id="ticketPriority" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option>Normal Priority</option>
+            <option>High Priority</option>
+            <option>Critical / Blocker</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Details & Message</label>
+          <textarea id="ticketBody" required rows="4" placeholder="Describe the inquiry in detail..." class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-3">
+          <button type="button" onclick="closeModal('ticketModal')" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm">Save to Database</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ISSUE INVOICE ================= -->
+  <div id="invoiceModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="font-bold text-slate-800 text-base">Issue New Invoice</h3>
+        <button onclick="closeModal('invoiceModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form onsubmit="handleInvoiceSubmit(event)" class="mt-4 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Billing Period / Service Description</label>
+          <input id="invPeriod" required type="text" placeholder="e.g. November 2026 (Sprint 5 Deliverables)" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Amount ($ USD)</label>
+          <input id="invAmount" required type="number" step="0.01" min="1" placeholder="4500.00" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Due Date Label</label>
+          <input id="invDueLabel" type="text" placeholder="e.g. Due in 15 Days" value="Due in 15 Days" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-3">
+          <button type="button" onclick="closeModal('invoiceModal')" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm">Generate in Database</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: EDIT USER & COMPANY PROFILE ================= -->
+  <div id="profileModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="font-bold text-slate-800 text-base">Edit Account & Company Profile</h3>
+        <button onclick="closeModal('profileModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form onsubmit="handleProfileUpdate(event)" class="mt-4 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
+          <input id="editUserName" required type="text" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Company / Organization Name</label>
+          <input id="editUserCompany" required type="text" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+          <input id="editUserEmail" required type="email" class="w-full text-xs px-3 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-3">
+          <button type="button" onclick="closeModal('profileModal')" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm">Save to SQLite</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: SHARE PORTAL ================= -->
+  <div id="shareModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="font-bold text-slate-800 text-base">Share Portal with Others</h3>
+        <button onclick="closeModal('shareModal')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <div class="mt-4 space-y-4 text-xs">
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+          <p class="font-semibold text-slate-700">1. Same Wi-Fi / Office Network Link:</p>
+          <div class="flex items-center gap-2">
+            <input id="shareNetworkUrl" readonly type="text" value="http://localhost:5000" class="flex-1 bg-white px-2.5 py-1.5 rounded border border-slate-200 text-indigo-600 font-mono text-[11px]" />
+            <button onclick="copyShareUrl()" class="px-3 py-1.5 bg-indigo-600 text-white rounded font-semibold hover:bg-indigo-700">Copy</button>
+          </div>
+          <p class="text-[11px] text-slate-400">Anyone on your Wi-Fi can open this URL in their browser.</p>
+        </div>
+
+        <div class="p-3 bg-indigo-50/60 rounded-xl border border-indigo-100 space-y-1.5">
+          <p class="font-semibold text-indigo-900">2. Worldwide Public Internet Link:</p>
+          <p class="text-[11px] text-indigo-700">Run this command in a second VS Code terminal:</p>
+          <code class="block bg-slate-900 text-emerald-400 px-3 py-2 rounded font-mono text-[11px]">npm run share</code>
+          <p class="text-[11px] text-slate-500">This generates an instant <strong>https://xxxx.loca.lt</strong> link you can send to anyone anywhere.</p>
+        </div>
+
+        <div class="flex justify-end pt-2">
+          <button onclick="closeModal('shareModal')" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-lg shadow-lg opacity-0 pointer-events-none transition-all duration-300 z-50">
+    Notification
+  </div>
+
+  <!-- ================= JAVASCRIPT DATABASE ENGINE (NODE.JS + GITHUB PAGES HYBRID) ================= -->
+  <script>
+    const API_BASE = window.location.protocol === 'file:' ? 'http://localhost:5000' : '';
+    let chartInstance = null;
+    let currentUser = null;
+    let currentTicketDetail = null;
+
+    // --- AUTOMATIC FALLBACK DATABASE FOR GITHUB PAGES / STATIC HOSTING ---
+    const STORAGE_KEY = 'apex_client_portal_relational_db_v2';
+    const originalFetch = window.fetch.bind(window);
+
+    function getLocalDB() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        try { return JSON.parse(raw); } catch (e) {}
+      }
+      const initialDB = {
+        user: {
+          id: 1,
+          email: 'sarah@acme.com',
+          full_name: 'Sarah Jenkins',
+          role: 'CLIENT',
+          company_name: 'Acme Global Ltd.',
+          account_id: '#ACME-8921',
+          avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80'
+        },
+        projects: [
+          { id: 1, user_id: 1, title: 'E-Commerce Web Platform', description: 'Complete frontend rebuild using Next.js with high-performance payment processing.', status: 'In Progress', progress: 75, due_date: 'Nov 15, 2026', lead_name: 'David Clark' },
+          { id: 2, user_id: 1, title: 'Cloud Infrastructure Migration', description: 'Terraform scripts and Kubernetes cluster deployment on AWS us-east-1.', status: 'Client Review', progress: 90, due_date: 'Oct 28, 2026', lead_name: 'Priya Patel' },
+          { id: 3, user_id: 1, title: 'Brand Identity & Design System', description: 'Complete vector asset pack, typography standards, and interactive UI library in Figma.', status: 'Completed', progress: 100, due_date: 'Delivered Sep 30', lead_name: 'Elena Rostova' }
+        ],
+        documents: [
+          { id: 1, user_id: 1, project_id: 1, name: 'Master Services Agreement (MSA) - Signed.pdf', category: 'Legal', size_label: '2.4 MB', file_url: 'data:text/plain;charset=utf-8,APEX%20DIGITAL%20MSA%20DOCUMENT', created_at: new Date().toISOString() },
+          { id: 2, user_id: 1, project_id: 2, name: 'API Architecture & Security Specs v2.0.pdf', category: 'Technical', size_label: '4.1 MB', file_url: 'data:text/plain;charset=utf-8,APEX%20DIGITAL%20API%20SPECS', created_at: new Date().toISOString() },
+          { id: 3, user_id: 1, project_id: 3, name: 'Brand Design Guidelines & Assets (ZIP).zip', category: 'Design', size_label: '48.2 MB', file_url: 'data:text/plain;charset=utf-8,APEX%20DIGITAL%20BRAND%20ASSETS', created_at: new Date().toISOString() }
+        ],
+        tickets: [
+          { id: 1, user_id: 1, project_id: 1, ticket_number: '#TK-402', subject: 'Production Webhook latency inquiry', description: 'Investigating the Redis queue latency on the staging endpoint.', priority: 'High Priority', status: 'In Progress', last_response: 'Under review by Lead Engineer', created_at: new Date().toISOString() },
+          { id: 2, user_id: 1, project_id: 2, ticket_number: '#TK-398', subject: 'Add 2 additional seats for Acme QA Team', description: 'Credentials and invitation links sent to both QA analysts.', priority: 'Normal Priority', status: 'Resolved', last_response: 'Closed on Oct 04, 2026', created_at: new Date().toISOString() }
+        ],
+        ticket_messages: [
+          { id: 1, ticket_id: 1, sender_name: 'Sarah Jenkins', sender_role: 'CLIENT', message: 'Hi Team, we noticed webhook delays of up to 450ms on our checkout hook.', created_at: new Date().toISOString() },
+          { id: 2, ticket_id: 1, sender_name: 'Lead Dev (David)', sender_role: 'SUPPORT', message: 'Hello Sarah, we are profiling the Redis queue worker latency right now.', created_at: new Date().toISOString() },
+          { id: 3, ticket_id: 2, sender_name: 'Sarah Jenkins', sender_role: 'CLIENT', message: 'Can you please provision access for our two QA leads?', created_at: new Date().toISOString() }
+        ],
+        invoices: [
+          { id: 1, user_id: 1, project_id: 1, invoice_number: '#INV-2026-08', period: 'October 2026 (Sprint 4 Milestones)', amount: 4850.00, status: 'Pending', due_label: 'Due in 5 Days' },
+          { id: 2, user_id: 1, project_id: 3, invoice_number: '#INV-2026-07', period: 'September 2026 (Design Phase)', amount: 6200.00, status: 'Paid', due_label: 'Paid on Oct 01' }
+        ],
+        activities: [
+          { id: 1, title: 'Sprint 4 Milestones Approved', author: 'Marcus Vance', time_label: '2 hours ago', color: 'emerald' },
+          { id: 2, title: 'Uploaded API Contract v2.1', author: 'Document Vault', time_label: 'Yesterday', color: 'blue' },
+          { id: 3, title: 'Invoice #INV-2026-08 Generated', author: 'Billing Department', time_label: '3 days ago', color: 'indigo' }
+        ],
+        notifications: [
+          { id: 1, title: 'Sprint Milestone Update', message: 'David Clark pushed Sprint 4 deliverable updates.', is_read: 0 },
+          { id: 2, title: 'Invoice Generated', message: 'Invoice #INV-2026-08 ($4,850.00) is ready for review.', is_read: 0 }
+        ]
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(initialDB));
+      return initialDB;
+    }
+
+    function saveLocalDB(db) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    }
+
+    function jsonResponse(data, status = 200) {
+      return new Response(JSON.stringify(data), {
+        status,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Intercept API calls: tries real Node.js backend first, falls back to built-in DB if on GitHub Pages
+    window.fetch = async function (url, options = {}) {
+      const urlStr = typeof url === 'string' ? url : url.toString();
+      if (!urlStr.includes('/api/')) {
+        return originalFetch(url, options);
+      }
+
+      try {
+        const res = await originalFetch(url, options);
+        if (res.ok) return res;
+      } catch (err) {
+        // Node.js server not running (e.g. GitHub Pages) -> fall back to browser relational DB
+      }
+
+      const db = getLocalDB();
+      const method = (options.method || 'GET').toUpperCase();
+      let body = {};
+      if (options.body && typeof options.body === 'string') {
+        try { body = JSON.parse(options.body); } catch (e) {}
+      } else if (options.body instanceof FormData) {
+        const file = options.body.get('file');
+        body = {
+          name: options.body.get('name') || (file ? file.name : 'Uploaded-File.pdf'),
+          category: options.body.get('category') || 'General',
+          size_label: file && file.size ? (file.size / (1024 * 1024)).toFixed(1) + ' MB' : '1.4 MB'
+        };
+      }
+
+      const findProjTitle = (pid) => {
+        const p = db.projects.find(x => x.id === Number(pid));
+        return p ? p.title : 'E-Commerce Web Platform';
+      };
+
+      if (urlStr.endsWith('/api/health')) {
+        return jsonResponse({ status: 'online', networkUrl: window.location.href });
+      }
+      if (urlStr.endsWith('/api/auth/me') && method === 'GET') {
+        return jsonResponse({ user: db.user });
+      }
+      if (urlStr.endsWith('/api/auth/profile') && method === 'PATCH') {
+        db.user = { ...db.user, ...body };
+        db.activities.unshift({ id: Date.now(), title: `Profile updated: ${db.user.company_name}`, author: 'Account Settings', time_label: 'Just now', color: 'indigo' });
+        saveLocalDB(db);
+        return jsonResponse({ message: 'Profile updated', user: db.user });
+      }
+      if (urlStr.endsWith('/api/auth/switch-role') && method === 'POST') {
+        db.user.role = db.user.role === 'CLIENT' ? 'ADMIN' : 'CLIENT';
+        saveLocalDB(db);
+        return jsonResponse({ message: `Role switched to ${db.user.role}`, user: db.user });
+      }
+      if (urlStr.endsWith('/api/dashboard/stats') && method === 'GET') {
+        const pendingAmt = db.invoices.filter(i => i.status !== 'Paid').reduce((s, i) => s + Number(i.amount), 0);
+        const avgProg = db.projects.length ? Math.round(db.projects.reduce((s, p) => s + Number(p.progress), 0) / db.projects.length) : 50;
+        return jsonResponse({
+          activeProjectsCount: db.projects.filter(p => p.status !== 'Completed').length,
+          totalProjectsCount: db.projects.length,
+          documentsCount: db.documents.length,
+          openTicketsCount: db.tickets.filter(t => t.status !== 'Resolved').length,
+          pendingInvoicesAmount: pendingAmt,
+          recentActivities: db.activities.slice(0, 6),
+          velocity: {
+            labels: ['Sprint 1 (Kickoff)', 'Sprint 2 (Architecture)', 'Sprint 3 (Core APIs)', 'Sprint 4 (Active Cycle)'],
+            delivered: [35, 42, 48, Math.max(30, Math.round(avgProg * 0.7))],
+            planned: [35, 40, 45, 55]
+          }
+        });
+      }
+      if (urlStr.endsWith('/api/projects') && method === 'GET') {
+        const joined = db.projects.map(p => ({
+          ...p,
+          client_name: db.user.full_name,
+          company_name: db.user.company_name,
+          linked_docs_count: db.documents.filter(d => d.project_id === p.id).length,
+          linked_tickets_count: db.tickets.filter(t => t.project_id === p.id).length,
+          linked_invoices_count: db.invoices.filter(i => i.project_id === p.id).length
+        }));
+        return jsonResponse(joined);
+      }
+      if (urlStr.endsWith('/api/projects') && method === 'POST') {
+        const newProj = { id: Date.now(), user_id: 1, title: body.title, description: body.description || '', status: body.status || 'In Progress', progress: Number(body.progress) || 0, due_date: body.due_date || 'Q4 2026', lead_name: body.lead_name || 'Engineering Lead' };
+        db.projects.unshift(newProj);
+        db.activities.unshift({ id: Date.now(), title: `New Project Created: ${newProj.title}`, author: newProj.lead_name, time_label: 'Just now', color: 'indigo' });
+        db.notifications.unshift({ id: Date.now(), title: 'Project Kickoff', message: `Deliverable "${newProj.title}" was initiated.`, is_read: 0 });
+        saveLocalDB(db);
+        return jsonResponse(newProj, 201);
+      }
+      if (urlStr.includes('/api/projects/') && method === 'PATCH') {
+        const id = Number(urlStr.split('/api/projects/')[1]);
+        const p = db.projects.find(x => x.id === id);
+        if (p) {
+          if (body.status) p.status = body.status;
+          if (body.progress !== undefined) p.progress = Number(body.progress);
+          db.activities.unshift({ id: Date.now(), title: `Updated ${p.title}: ${p.progress}% (${p.status})`, author: 'System', time_label: 'Just now', color: 'emerald' });
+          saveLocalDB(db);
+        }
+        return jsonResponse(p || {});
+      }
+      if (urlStr.includes('/api/projects/') && method === 'DELETE') {
+        const id = Number(urlStr.split('/api/projects/')[1]);
+        db.projects = db.projects.filter(x => x.id !== id);
+        saveLocalDB(db);
+        return jsonResponse({ message: 'Deleted' });
+      }
+      if (urlStr.endsWith('/api/documents') && method === 'GET') {
+        return jsonResponse(db.documents.map(d => ({ ...d, project_title: findProjTitle(d.project_id), owner_name: db.user.full_name })));
+      }
+      if (urlStr.endsWith('/api/documents/upload') && method === 'POST') {
+        const newDoc = { id: Date.now(), user_id: 1, project_id: 1, name: body.name || 'Document.pdf', category: body.category || 'General', size_label: body.size_label || '1.4 MB', file_url: 'data:text/plain;charset=utf-8,APEX%20DIGITAL%20DOCUMENT', created_at: new Date().toISOString() };
+        db.documents.unshift(newDoc);
+        db.activities.unshift({ id: Date.now(), title: `File Vault Sync: ${newDoc.name}`, author: 'Document Vault', time_label: 'Just now', color: 'blue' });
+        db.notifications.unshift({ id: Date.now(), title: 'Document Added', message: `"${newDoc.name}" added to Document Vault.`, is_read: 0 });
+        saveLocalDB(db);
+        return jsonResponse(newDoc, 201);
+      }
+      if (urlStr.includes('/api/documents/') && method === 'DELETE') {
+        const id = Number(urlStr.split('/api/documents/')[1]);
+        db.documents = db.documents.filter(x => x.id !== id);
+        saveLocalDB(db);
+        return jsonResponse({ message: 'Deleted' });
+      }
+      if (urlStr.endsWith('/api/tickets') && method === 'GET') {
+        return jsonResponse(db.tickets.map(t => ({
+          ...t,
+          project_title: findProjTitle(t.project_id),
+          message_count: db.ticket_messages.filter(m => m.ticket_id === t.id).length
+        })));
+      }
+      if (urlStr.endsWith('/api/tickets') && method === 'POST') {
+        const tid = Date.now();
+        const tnum = `#TK-${Math.floor(100 + Math.random() * 900)}`;
+        const newT = { id: tid, user_id: 1, project_id: 1, ticket_number: tnum, subject: body.subject, description: body.description, priority: body.priority || 'Normal Priority', status: 'Open', last_response: 'New request queued', created_at: new Date().toISOString() };
+        db.tickets.unshift(newT);
+        db.ticket_messages.push({ id: Date.now() + 1, ticket_id: tid, sender_name: db.user.full_name, sender_role: 'CLIENT', message: body.description, created_at: new Date().toISOString() });
+        db.activities.unshift({ id: Date.now(), title: `Ticket Created: ${tnum}`, author: 'Support Portal', time_label: 'Just now', color: 'amber' });
+        saveLocalDB(db);
+        return jsonResponse(newT, 201);
+      }
+      if (urlStr.includes('/api/tickets/') && urlStr.endsWith('/messages') && method === 'POST') {
+        const tid = Number(urlStr.split('/api/tickets/')[1].split('/')[0]);
+        db.ticket_messages.push({ id: Date.now(), ticket_id: tid, sender_name: body.sender_name || db.user.full_name, sender_role: body.sender_role || 'CLIENT', message: body.message, created_at: new Date().toISOString() });
+        const t = db.tickets.find(x => x.id === tid);
+        if (t) t.last_response = `Latest message from ${body.sender_name || db.user.full_name}`;
+        saveLocalDB(db);
+        return jsonResponse({ message: 'Reply sent', messages: db.ticket_messages.filter(m => m.ticket_id === tid) });
+      }
+      if (urlStr.includes('/api/tickets/') && urlStr.endsWith('/status') && method === 'PATCH') {
+        const tid = Number(urlStr.split('/api/tickets/')[1].split('/')[0]);
+        const t = db.tickets.find(x => x.id === tid);
+        if (t) t.status = body.status;
+        saveLocalDB(db);
+        return jsonResponse(t || {});
+      }
+      if (urlStr.includes('/api/tickets/') && method === 'GET') {
+        const tid = Number(urlStr.split('/api/tickets/')[1]);
+        const t = db.tickets.find(x => x.id === tid);
+        return jsonResponse({ ...t, messages: db.ticket_messages.filter(m => m.ticket_id === tid) });
+      }
+      if (urlStr.endsWith('/api/invoices') && method === 'GET') {
+        return jsonResponse(db.invoices.map(inv => ({ ...inv, project_title: findProjTitle(inv.project_id) })));
+      }
+      if (urlStr.endsWith('/api/invoices') && method === 'POST') {
+        const invNum = `#INV-2026-${Math.floor(10 + Math.random() * 90)}`;
+        const newInv = { id: Date.now(), user_id: 1, project_id: 1, invoice_number: invNum, period: body.period, amount: parseFloat(body.amount), status: 'Pending', due_label: body.due_label || 'Due in 15 Days' };
+        db.invoices.unshift(newInv);
+        db.activities.unshift({ id: Date.now(), title: `Invoice Issued: ${invNum}`, author: 'Finance Team', time_label: 'Just now', color: 'indigo' });
+        saveLocalDB(db);
+        return jsonResponse(newInv, 201);
+      }
+      if (urlStr.includes('/api/invoices/') && urlStr.endsWith('/pay') && method === 'POST') {
+        const id = Number(urlStr.split('/api/invoices/')[1].split('/')[0]);
+        const inv = db.invoices.find(x => x.id === id);
+        if (inv) {
+          inv.status = 'Paid';
+          inv.due_label = 'Paid via Sandbox';
+          db.activities.unshift({ id: Date.now(), title: `Payment received for ${inv.invoice_number}`, author: 'Billing Gateway', time_label: 'Just now', color: 'emerald' });
+          saveLocalDB(db);
+        }
+        return jsonResponse({ message: 'Paid', invoice: inv });
+      }
+      if (urlStr.endsWith('/api/notifications') && method === 'GET') {
+        return jsonResponse({ notifications: db.notifications, unreadCount: db.notifications.filter(n => !n.is_read).length });
+      }
+      if (urlStr.endsWith('/api/notifications/mark-read') && method === 'POST') {
+        db.notifications.forEach(n => n.is_read = 1);
+        saveLocalDB(db);
+        return jsonResponse({ message: 'Marked read' });
+      }
+      return jsonResponse({});
+    };
+
+    async function openShareModal() {
+      openModal('shareModal');
+      try {
+        const res = await fetch(`${API_BASE}/api/health`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.networkUrl) {
+            document.getElementById('shareNetworkUrl').value = data.networkUrl;
+          }
+        }
+      } catch (e) {}
+    }
+
+    function copyShareUrl() {
+      const input = document.getElementById('shareNetworkUrl');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      showToast('Share URL copied to clipboard!');
+    }
+
+    // Toast Alert
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none');
+        toast.classList.remove('opacity-100');
+      }, 3500);
+    }
+
+    // Tab Navigation
+    const tabs = ['dashboard', 'projects', 'documents', 'tickets', 'invoices'];
+    function switchTab(tabId) {
+      tabs.forEach(tab => {
+        const section = document.getElementById(`tab-${tab}`);
+        const navBtn = document.getElementById(`nav-${tab}`);
+        if (tab === tabId) {
+          section.classList.remove('hidden');
+          navBtn.className = "nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-indigo-600 text-white transition";
+        } else {
+          section.classList.add('hidden');
+          navBtn.className = "nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition";
+        }
+      });
+      lucide.createIcons();
+    }
+
+    // Modal Control
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    // Toggle Notifications
+    function toggleNotifications() {
+      const dd = document.getElementById('notif-dropdown');
+      dd.classList.toggle('hidden');
+    }
+
+    // ================= DATA FETCHING =================
+
+    async function fetchAllData() {
+      try {
+        await Promise.all([
+          fetchUserProfile(),
+          fetchStats(),
+          fetchProjects(),
+          fetchDocuments(),
+          fetchTickets(),
+          fetchInvoices(),
+          fetchNotifications()
+        ]);
+        lucide.createIcons();
+      } catch (err) {
+        console.warn('API sync error:', err);
+      }
+    }
+
+    // 1. User Profile
+    async function fetchUserProfile() {
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/me`);
+        if (!res.ok) return;
+        const { user } = await res.json();
+        currentUser = user;
+        document.getElementById('user-name').innerText = user.full_name;
+        document.getElementById('welcome-name').innerText = user.full_name.split(' ')[0];
+        document.getElementById('user-company').innerText = user.company_name;
+        document.getElementById('user-account-id').innerText = user.account_id;
+        document.getElementById('role-toggle-label').innerText = `Role: ${user.role}`;
+        document.getElementById('sidebar-role-badge').innerText = `${user.role === 'ADMIN' ? 'Admin Portal' : 'Client Portal'}`;
+        if (user.avatar_url) document.getElementById('user-avatar').src = user.avatar_url;
+
+        // Populate profile form inputs
+        document.getElementById('editUserName').value = user.full_name;
+        document.getElementById('editUserCompany').value = user.company_name;
+        document.getElementById('editUserEmail').value = user.email;
+      } catch (e) {}
+    }
+
+    // 2. Dashboard KPIs & Chart
+    async function fetchStats() {
+      try {
+        const res = await fetch(`${API_BASE}/api/dashboard/stats`);
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        document.getElementById('kpi-projects').innerText = data.activeProjectsCount;
+        document.getElementById('badge-projects-count').innerText = data.totalProjectsCount;
+        document.getElementById('kpi-documents').innerText = data.documentsCount;
+        document.getElementById('badge-documents-count').innerText = data.documentsCount;
+        document.getElementById('kpi-tickets').innerText = data.openTicketsCount;
+        document.getElementById('badge-tickets-count').innerText = `${data.openTicketsCount} Open`;
+        document.getElementById('kpi-invoices').innerText = `$${data.pendingInvoicesAmount.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+        // Render activity logs
+        const actContainer = document.getElementById('activity-container');
+        actContainer.innerHTML = data.recentActivities.map(act => `
+          <div class="flex items-start gap-3">
+            <div class="w-2 h-2 rounded-full bg-${act.color || 'indigo'}-500 mt-2"></div>
+            <div>
+              <p class="text-xs font-medium text-slate-800">${act.title}</p>
+              <p class="text-[11px] text-slate-400">${act.author} · ${act.time_label}</p>
+            </div>
+          </div>
+        `).join('');
+
+        if (data.velocity) renderChart(data.velocity);
+      } catch (e) {}
+    }
+
+    // 3. Projects CRUD (with SQL JOIN counts)
+    async function fetchProjects() {
+      try {
+        const res = await fetch(`${API_BASE}/api/projects`);
+        if (!res.ok) return;
+        const projects = await res.json();
+        const container = document.getElementById('projects-grid');
+        
+        container.innerHTML = projects.map(p => `
+          <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full ${
+                  p.status === 'Completed' ? 'bg-emerald-50 text-emerald-700' :
+                  p.status === 'Client Review' ? 'bg-amber-50 text-amber-700' : 'bg-indigo-50 text-indigo-700'
+                }">${p.status}</span>
+                <span class="text-xs text-slate-400">Due ${p.due_date}</span>
+              </div>
+              <h3 class="font-semibold text-slate-800 text-base">${p.title}</h3>
+              <p class="text-xs text-slate-500 mt-1 line-clamp-2">${p.description}</p>
+              
+              <div class="mt-4 flex items-center gap-2 text-[11px] text-slate-500">
+                <span class="px-2 py-0.5 bg-slate-100 rounded">${p.linked_docs_count || 0} Docs</span>
+                <span class="px-2 py-0.5 bg-slate-100 rounded">${p.linked_tickets_count || 0} Tickets</span>
+                <span class="px-2 py-0.5 bg-slate-100 rounded">${p.linked_invoices_count || 0} Invoices</span>
+              </div>
+
+              <div class="mt-4 space-y-2">
+                <div class="flex justify-between text-xs font-medium">
+                  <span class="text-slate-600">Progress</span>
+                  <span class="text-indigo-600 font-bold">${p.progress}%</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-indigo-600 h-full rounded-full transition-all duration-500" style="width: ${p.progress}%"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
+              <span class="text-slate-500">Lead: <strong>${p.lead_name}</strong></span>
+              <div class="flex items-center gap-2">
+                <button onclick="openProjectUpdateModal(${p.id}, '${escapeQuotes(p.title)}', '${p.status}', ${p.progress})" class="text-indigo-600 hover:text-indigo-800 font-semibold">Update</button>
+                <button onclick="deleteProject(${p.id})" class="text-slate-400 hover:text-rose-600 transition"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {}
+    }
+
+    // 4. Documents Vault (with SQL JOIN project_title)
+    async function fetchDocuments() {
+      try {
+        const res = await fetch(`${API_BASE}/api/documents`);
+        if (!res.ok) return;
+        const docs = await res.json();
+        const tbody = document.getElementById('documents-table-body');
+        
+        tbody.innerHTML = docs.map(d => `
+          <tr class="hover:bg-slate-50/70 transition">
+            <td class="py-3.5 px-4 font-medium">
+              <div class="flex items-center gap-2">
+                <i data-lucide="file-text" class="w-4 h-4 text-indigo-600"></i>
+                <span>${d.name}</span>
+              </div>
+              <span class="text-[10px] text-slate-400 ml-6">Linked Project: ${d.project_title || 'General Account'}</span>
+            </td>
+            <td class="py-3.5 px-4 text-slate-500">${d.category}</td>
+            <td class="py-3.5 px-4 text-slate-500">${d.size_label}</td>
+            <td class="py-3.5 px-4 text-slate-500">${new Date(d.created_at).toLocaleDateString()}</td>
+            <td class="py-3.5 px-4 text-right">
+              <div class="inline-flex items-center gap-3">
+                <a href="${d.file_url}" target="_blank" download class="text-indigo-600 hover:text-indigo-800 font-medium">Download</a>
+                <button onclick="deleteDocument(${d.id})" class="text-slate-400 hover:text-rose-600"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) {}
+    }
+
+    // 5. Support Tickets (with SQL JOIN project_title & message_count)
+    async function fetchTickets() {
+      try {
+        const res = await fetch(`${API_BASE}/api/tickets`);
+        if (!res.ok) return;
+        const tickets = await res.json();
+        const container = document.getElementById('tickets-container');
+        
+        container.innerHTML = tickets.map(t => `
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between hover:border-slate-300 transition">
+            <div class="flex items-start gap-4">
+              <div class="w-9 h-9 rounded-full ${t.status === 'Resolved' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'} flex items-center justify-center flex-shrink-0">
+                <i data-lucide="${t.status === 'Resolved' ? 'check-circle' : 'alert-circle'}" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <h4 class="text-sm font-semibold text-slate-800">${t.ticket_number}: ${t.subject}</h4>
+                  <span class="text-[11px] font-medium px-2 py-0.5 rounded-full ${t.status === 'Resolved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${t.status}</span>
+                  <span class="text-[11px] font-medium px-2 py-0.5 rounded ${t.priority.includes('High') || t.priority.includes('Critical') ? 'bg-rose-50 text-rose-600' : 'bg-slate-100 text-slate-600'}">${t.priority}</span>
+                  <span class="text-[10px] font-medium px-2 py-0.5 rounded bg-indigo-50 text-indigo-700">${t.project_title || 'General'}</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">${t.description}</p>
+                <p class="text-[11px] text-slate-400 mt-2">${t.last_response || 'In Queue'} · <strong>${t.message_count || 1} messages</strong></p>
+              </div>
+            </div>
+            <button onclick="openTicketThread(${t.id})" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold transition">
+              View Conversation &rarr;
+            </button>
+          </div>
+        `).join('');
+      } catch (e) {}
+    }
+
+    // 6. Invoices (with SQL JOIN project_title)
+    async function fetchInvoices() {
+      try {
+        const res = await fetch(`${API_BASE}/api/invoices`);
+        if (!res.ok) return;
+        const invoices = await res.json();
+        const tbody = document.getElementById('invoices-table-body');
+        
+        tbody.innerHTML = invoices.map(inv => `
+          <tr class="hover:bg-slate-50/70 transition">
+            <td class="py-3.5 px-4 font-semibold text-slate-900">${inv.invoice_number}</td>
+            <td class="py-3.5 px-4 text-slate-500">
+              <div>${inv.period}</div>
+              <div class="text-[10px] text-indigo-600 font-medium">Project: ${inv.project_title || 'General Retainer'}</div>
+            </td>
+            <td class="py-3.5 px-4 font-bold text-slate-900">$${Number(inv.amount).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+            <td class="py-3.5 px-4">
+              <span class="text-[11px] font-medium px-2 py-0.5 rounded-full ${inv.status === 'Paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">
+                ${inv.status === 'Paid' ? 'Paid' : inv.due_label || 'Pending'}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-right">
+              <div class="inline-flex items-center gap-2">
+                ${inv.status !== 'Paid' ? `
+                  <button onclick="payInvoice(${inv.id})" class="px-3 py-1 bg-indigo-600 text-white rounded font-medium hover:bg-indigo-700 transition">Pay Now</button>
+                ` : `
+                  <a href="${API_BASE}/api/invoices/${inv.id}/receipt" download class="px-2.5 py-1 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded font-medium transition">Receipt .TXT</a>
+                `}
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) {}
+    }
+
+    // 7. Notifications
+    async function fetchNotifications() {
+      try {
+        const res = await fetch(`${API_BASE}/api/notifications`);
+        if (!res.ok) return;
+        const { notifications, unreadCount } = await res.json();
+        
+        const badge = document.getElementById('notif-badge');
+        if (unreadCount > 0) badge.classList.remove('hidden');
+        else badge.classList.add('hidden');
+
+        const list = document.getElementById('notif-list');
+        list.innerHTML = notifications.map(n => `
+          <div class="p-2 rounded-lg ${n.is_read ? 'bg-slate-50 text-slate-500' : 'bg-indigo-50/60 text-slate-800'} text-xs">
+            <p class="font-semibold">${n.title}</p>
+            <p class="text-[11px] text-slate-600 mt-0.5">${n.message}</p>
+          </div>
+        `).join('');
+      } catch (e) {}
+    }
+
+    async function markNotificationsRead() {
+      await fetch(`${API_BASE}/api/notifications/mark-read`, { method: 'POST' });
+      fetchNotifications();
+      showToast('All notifications marked as read.');
+    }
+
+    // ================= ACTIONS & CRUD HANDLERS =================
+
+    // Create Project
+    async function handleProjectSubmit(e) {
+      e.preventDefault();
+      const title = document.getElementById('projTitle').value;
+      const description = document.getElementById('projDesc').value;
+      const status = document.getElementById('projStatus').value;
+      const progress = document.getElementById('projProgress').value;
+      const due_date = document.getElementById('projDueDate').value;
+      const lead_name = document.getElementById('projLead').value;
+
+      const res = await fetch(`${API_BASE}/api/projects`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description, status, progress, due_date, lead_name })
+      });
+
+      if (res.ok) {
+        closeModal('projectModal');
+        showToast(`Project created in SQLite: "${title}"`);
+        document.getElementById('projTitle').value = '';
+        document.getElementById('projDesc').value = '';
+        fetchAllData();
+      }
+    }
+
+    // Open Project Update
+    function openProjectUpdateModal(id, title, status, progress) {
+      document.getElementById('editProjId').value = id;
+      document.getElementById('editProjTitle').innerText = title;
+      document.getElementById('editProjStatus').value = status;
+      document.getElementById('editProjProgress').value = progress;
+      document.getElementById('editProgVal').innerText = progress + '%';
+      openModal('updateProjModal');
+    }
+
+    // Save Project Update
+    async function handleProjectUpdate(e) {
+      e.preventDefault();
+      const id = document.getElementById('editProjId').value;
+      const status = document.getElementById('editProjStatus').value;
+      const progress = document.getElementById('editProjProgress').value;
+
+      const res = await fetch(`${API_BASE}/api/projects/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, progress })
+      });
+
+      if (res.ok) {
+        closeModal('updateProjModal');
+        showToast('Project progress updated in database.');
+        fetchAllData();
+      }
+    }
+
+    // Delete Project
+    async function deleteProject(id) {
+      if (!confirm('Are you sure you want to delete this project?')) return;
+      await fetch(`${API_BASE}/api/projects/${id}`, { method: 'DELETE' });
+      showToast('Project removed from SQLite.');
+      fetchAllData();
+    }
+
+    // Upload Document (Multer Multipart)
+    async function handleDocUpload(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('docFileInput');
+      const name = document.getElementById('docName').value;
+      const category = document.getElementById('docCategory').value;
+
+      const formData = new FormData();
+      if (fileInput.files.length > 0) {
+        formData.append('file', fileInput.files[0]);
+      }
+      formData.append('name', name);
+      formData.append('category', category);
+
+      const res = await fetch(`${API_BASE}/api/documents/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (res.ok) {
+        closeModal('docModal');
+        showToast('Document saved to server disk & SQLite vault.');
+        document.getElementById('docFileInput').value = '';
+        document.getElementById('docName').value = '';
+        fetchAllData();
+      }
+    }
+
+    // Delete Document
+    async function deleteDocument(id) {
+      if (!confirm('Delete this document?')) return;
+      await fetch(`${API_BASE}/api/documents/${id}`, { method: 'DELETE' });
+      showToast('Document deleted from database.');
+      fetchAllData();
+    }
+
+    // Open Ticket Conversation Thread
+    async function openTicketThread(id) {
+      try {
+        const res = await fetch(`${API_BASE}/api/tickets/${id}`);
+        if (!res.ok) return;
+        const ticket = await res.json();
+        currentTicketDetail = ticket;
+
+        document.getElementById('activeThreadId').value = ticket.id;
+        document.getElementById('threadTicketTitle').innerText = `${ticket.ticket_number}: ${ticket.subject}`;
+        document.getElementById('threadTicketSubtitle').innerText = `${ticket.status} · Priority: ${ticket.priority}`;
+        document.getElementById('toggleResolvedBtn').innerText = ticket.status === 'Resolved' ? 'Reopen Ticket' : 'Mark as Resolved';
+
+        renderThreadMessages(ticket.messages || []);
+        openModal('threadModal');
+        lucide.createIcons();
+      } catch (e) {}
+    }
+
+    function renderThreadMessages(messages) {
+      const container = document.getElementById('threadMessagesContainer');
+      container.innerHTML = messages.map(m => `
+        <div class="flex flex-col ${m.sender_role === 'CLIENT' ? 'items-end' : 'items-start'}">
+          <div class="text-[10px] text-slate-400 mb-0.5 px-1">${m.sender_name} (${m.sender_role})</div>
+          <div class="max-w-[80%] rounded-xl px-3.5 py-2 text-xs ${
+            m.sender_role === 'CLIENT' ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-slate-100 text-slate-800 rounded-bl-none'
+          }">
+            ${m.message}
+          </div>
+          <div class="text-[9px] text-slate-400 mt-0.5 px-1">${new Date(m.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+        </div>
+      `).join('');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Send Reply to Ticket Thread
+    async function handleSendReply(e) {
+      e.preventDefault();
+      const ticketId = document.getElementById('activeThreadId').value;
+      const message = document.getElementById('threadReplyInput').value;
+      const sender_role = document.getElementById('replySenderRole').value;
+      const sender_name = sender_role === 'CLIENT' ? (currentUser ? currentUser.full_name : 'Sarah Jenkins') : 'Apex Lead Support';
+
+      const res = await fetch(`${API_BASE}/api/tickets/${ticketId}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, sender_name, sender_role })
+      });
+
+      if (res.ok) {
+        document.getElementById('threadReplyInput').value = '';
+        const data = await res.json();
+        renderThreadMessages(data.messages);
+        showToast('Reply saved in SQLite thread.');
+        fetchAllData();
+      }
+    }
+
+    // Toggle Ticket Resolved
+    async function toggleTicketResolvedStatus() {
+      if (!currentTicketDetail) return;
+      const newStatus = currentTicketDetail.status === 'Resolved' ? 'In Progress' : 'Resolved';
+      const res = await fetch(`${API_BASE}/api/tickets/${currentTicketDetail.id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (res.ok) {
+        currentTicketDetail.status = newStatus;
+        document.getElementById('toggleResolvedBtn').innerText = newStatus === 'Resolved' ? 'Reopen Ticket' : 'Mark as Resolved';
+        document.getElementById('threadTicketSubtitle').innerText = `${newStatus} · Priority: ${currentTicketDetail.priority}`;
+        showToast(`Ticket status updated to ${newStatus}`);
+        fetchAllData();
+      }
+    }
+
+    // Submit New Ticket
+    async function handleTicketSubmit(e) {
+      e.preventDefault();
+      const subject = document.getElementById('ticketSubject').value;
+      const priority = document.getElementById('ticketPriority').value;
+      const description = document.getElementById('ticketBody').value;
+
+      const res = await fetch(`${API_BASE}/api/tickets`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, priority, description, sender_name: currentUser ? currentUser.full_name : 'Sarah Jenkins' })
+      });
+
+      if (res.ok) {
+        closeModal('ticketModal');
+        showToast('New ticket and thread opened in SQLite.');
+        document.getElementById('ticketSubject').value = '';
+        document.getElementById('ticketBody').value = '';
+        fetchAllData();
+      }
+    }
+
+    // Issue New Invoice
+    async function handleInvoiceSubmit(e) {
+      e.preventDefault();
+      const period = document.getElementById('invPeriod').value;
+      const amount = document.getElementById('invAmount').value;
+      const due_label = document.getElementById('invDueLabel').value;
+
+      const res = await fetch(`${API_BASE}/api/invoices`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ period, amount, due_label })
+      });
+
+      if (res.ok) {
+        closeModal('invoiceModal');
+        showToast('New invoice recorded in SQLite.');
+        document.getElementById('invPeriod').value = '';
+        document.getElementById('invAmount').value = '';
+        fetchAllData();
+      }
+    }
+
+    // Pay Invoice
+    async function payInvoice(id) {
+      const res = await fetch(`${API_BASE}/api/invoices/${id}/pay`, { method: 'POST' });
+      if (res.ok) {
+        showToast('Payment confirmed! Marked as Paid in SQLite.');
+        fetchAllData();
+      }
+    }
+
+    // Edit Profile
+    async function handleProfileUpdate(e) {
+      e.preventDefault();
+      const full_name = document.getElementById('editUserName').value;
+      const company_name = document.getElementById('editUserCompany').value;
+      const email = document.getElementById('editUserEmail').value;
+
+      const res = await fetch(`${API_BASE}/api/auth/profile`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ full_name, company_name, email })
+      });
+
+      if (res.ok) {
+        closeModal('profileModal');
+        showToast('Profile and company updated in SQLite.');
+        fetchAllData();
+      }
+    }
+
+    // Toggle Role (Admin vs Client)
+    async function toggleUserRole() {
+      const res = await fetch(`${API_BASE}/api/auth/switch-role`, { method: 'POST' });
+      if (res.ok) {
+        const data = await res.json();
+        showToast(data.message);
+        fetchAllData();
+      }
+    }
+
+    // Helper
+    function escapeQuotes(str) {
+      return (str || '').replace(/'/g, "\\'");
+    }
+
+    // Velocity Chart
+    function renderChart(velocityData) {
+      const ctx = document.getElementById('velocityChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+      
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: velocityData.labels,
+          datasets: [
+            {
+              label: 'Story Points Delivered',
+              data: velocityData.delivered,
+              backgroundColor: '#6366f1',
+              borderRadius: 6
+            },
+            {
+              label: 'Planned Target',
+              data: velocityData.planned,
+              backgroundColor: '#e0e7ff',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+          },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      fetchAllData();
+    });
+  </script>
+</body>
+</html>
